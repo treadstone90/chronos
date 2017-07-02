@@ -9,7 +9,6 @@ import org.jgrapht.experimental.dag.DirectedAcyclicGraph
 import org.jgrapht.ext.{DOTExporter, IntegerNameProvider, StringNameProvider}
 import org.jgrapht.graph.DefaultEdge
 
-import scala.collection.convert.decorateAsScala._
 import scala.collection.mutable.ListBuffer
 import scala.collection.{mutable, _}
 import scala.collection.JavaConverters._
@@ -23,7 +22,7 @@ class JobGraph {
   val dag = new DirectedAcyclicGraph[String, DefaultEdge](classOf[DefaultEdge])
   val edgeInvocationCount = mutable.Map[DefaultEdge, Long]()
   private[this] val log = Logger.getLogger(getClass.getName)
-  private[this] val jobNameMapping: concurrent.Map[String, BaseJob] = new ConcurrentHashMap().asScala
+  private[this] val jobNameMapping: concurrent.Map[String, BaseJob] = new ConcurrentHashMap[String, BaseJob]().asScala
   private[this] val lock = new Object
 
   def parentJobs(job: DependencyBasedJob) = parentJobsOption(job) match {
