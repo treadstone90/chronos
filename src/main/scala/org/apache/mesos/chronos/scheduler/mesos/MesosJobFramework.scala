@@ -1,7 +1,9 @@
 package org.apache.mesos.chronos.scheduler.mesos
 
+import java.util.concurrent.atomic.AtomicLong
 import java.util.logging.Logger
 
+import com.codahale.metrics.{Gauge, MetricRegistry}
 import com.google.inject.Inject
 import mesosphere.mesos.util.FrameworkIdUtil
 import org.apache.mesos.Protos._
@@ -24,6 +26,7 @@ class MesosJobFramework @Inject()(
                                    val mesosDriver: MesosDriverFactory,
                                    val scheduler: JobScheduler,
                                    val taskManager: TaskManager,
+                                   val registry: MetricRegistry,
                                    val config: SchedulerConfiguration,
                                    val frameworkIdUtil: FrameworkIdUtil,
                                    val taskBuilder: MesosTaskBuilder,
@@ -40,6 +43,13 @@ class MesosJobFramework @Inject()(
         Filters.getDefaultInstance
     }
   }
+
+  private val offersReceivedCounter = registry.counter("offers_received")
+
+  private val offersUsedCounter = registry.counter("offers_used")
+
+  private val offersDeclinedCounter = registry.counter("offers_declined")
+
   val frameworkName = "chronos"
   private[this] val log = Logger.getLogger(getClass.getName)
   private var lastReconciliation = DateTime.now.plusSeconds(config.reconciliationInterval())
@@ -94,19 +104,23 @@ class MesosJobFramework @Inject()(
   @Override
   def resourceOffers(schedulerDriver: SchedulerDriver, receivedOffers: java.util.List[Offer]) {
     log.fine("Received resource offers")
+    offersReceivedCounter.inc(receivedOffers.size)
     import scala.collection.JavaConverters._
 
     val offers = receivedOffers.asScala.toList
-    val offerResources = mutable.HashMap(offers.map(o => (o, Resources(o))).toSeq: _*)
+    val offerResources = mutable.HashMap(offers.map(o => (o, Resources(o))): _*)
     val tasksToLaunch = generateLaunchableTasks(offerResources)
 
     log.fine("Declining unused offers.")
-    val usedOffers = mutable.HashSet(tasksToLaunch.map(_._3.getId.getValue): _*)
+    val usedOffers = tasksToLaunch.map { case(_, _, offer) => offer.getId.getValue }.toSet
+    offersUsedCounter.inc(usedOffers.size)
 
-    offers.foreach(o => {
-      if (!usedOffers.contains(o.getId.getValue))
-        checkDriver(mesosDriver.get.declineOffer(o.getId, declineOfferFilters))
-    })
+    val unusedOffers = offers.filterNot(o => usedOffers.contains(o.getId.getValue))
+    offersDeclinedCounter.inc(unusedOffers.size)
+
+    unusedOffers.foreach { o =>
+      checkDriver(mesosDriver.get.declineOffer(o.getId, declineOfferFilters))
+    }
 
     log.fine(s"Declined unused offers with filter refuseSeconds=${declineOfferFilters.getRefuseSeconds} " +
       s"(use --${config.declineOfferDuration.name} to reconfigure)")

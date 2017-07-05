@@ -102,9 +102,9 @@ class MesosStatePersistenceStore @Inject()(val zk: CuratorFramework,
     import scala.collection.JavaConversions._
 
     state.names.get.filter(_.startsWith(jobPrefix))
-      .map({
+      .map {
         x: String => JobUtils.fromBytes(state.fetch(x).get.value)
-      })
+      }
   }
 
   private def remove(name: String): Boolean = {
