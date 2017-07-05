@@ -1,5 +1,6 @@
 package org.apache.mesos.chronos.scheduler.mesos
 
+import com.codahale.metrics.MetricRegistry
 import mesosphere.mesos.protos._
 import mesosphere.mesos.util.FrameworkIdUtil
 import org.apache.mesos.Protos.Offer
@@ -19,7 +20,7 @@ class MesosJobFrameworkSpec extends SpecificationWithJUnit with Mockito {
       val mesosJobFramework = new MesosJobFramework(
         MockJobUtils.mockDriverFactory,
         mock[JobScheduler],
-        mock[TaskManager],
+        mock[TaskManager], mock[MetricRegistry],
         makeConfig(),
         mock[FrameworkIdUtil],
         mock[MesosTaskBuilder],
@@ -37,7 +38,7 @@ class MesosJobFrameworkSpec extends SpecificationWithJUnit with Mockito {
       val mesosJobFramework = new MesosJobFramework(
         mock[MesosDriverFactory],
         mock[JobScheduler],
-        mock[TaskManager],
+        mock[TaskManager], mock[MetricRegistry],
         makeConfig(),
         mock[FrameworkIdUtil],
         mock[MesosTaskBuilder],
@@ -60,7 +61,7 @@ class MesosJobFrameworkSpec extends SpecificationWithJUnit with Mockito {
         new MesosJobFramework(
           mockDriverFactory,
           mock[JobScheduler],
-          mock[TaskManager],
+          mock[TaskManager], mock[MetricRegistry],
           makeConfig(),
           mock[FrameworkIdUtil],
           mock[MesosTaskBuilder],
@@ -88,7 +89,7 @@ class MesosJobFrameworkSpec extends SpecificationWithJUnit with Mockito {
         new MesosJobFramework(
           mockDriverFactory,
           mock[JobScheduler],
-          mock[TaskManager],
+          mock[TaskManager], mock[MetricRegistry],
           makeConfig(),
           mock[FrameworkIdUtil],
           mock[MesosTaskBuilder],
@@ -114,7 +115,7 @@ class MesosJobFrameworkSpec extends SpecificationWithJUnit with Mockito {
       val mesosJobFramework = new MesosJobFramework(
         mockDriverFactory,
         jobScheduler,
-        MockJobUtils.mockTaskManager,
+        MockJobUtils.mockTaskManager, mock[MetricRegistry],
         makeConfig(),
         mock[FrameworkIdUtil],
         mock[MesosTaskBuilder],
@@ -158,7 +159,7 @@ class MesosJobFrameworkSpec extends SpecificationWithJUnit with Mockito {
       new MesosJobFramework(
         mesosDriverFactory,
         mock[JobScheduler],
-        MockJobUtils.mockTaskManager,
+        MockJobUtils.mockTaskManager, mock[MetricRegistry],
         makeConfig("--decline_offer_duration", "3000"),
         mock[FrameworkIdUtil],
         mock[MesosTaskBuilder],

@@ -81,7 +81,7 @@ class Iso8601JobResource @Inject()(val jobScheduler: JobScheduler,
         //TODO(FL): Create a wrapper class that handles adding & removing jobs!
         jobScheduler.loadJob(newJob)
         iso8601JobSubmissions.incrementAndGet()
-        log.info("Added job to JobGraph")
+        log.info(s"Added job ${newJob.name} to JobGraph")
         Response.noContent().build()
       } else {
         val oldJob = oldJobOpt.get
