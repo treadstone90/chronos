@@ -510,7 +510,7 @@ class JobScheduler @Inject()(val taskManager: TaskManager,
     val jobScheduler = this
     //Consider making this a background thread or control via an executor.
 
-    val f = localExecutor.submit(new Thread() {
+    val f = localExecutor.submit( new Runnable {
       override def run() {
         log.info("Running background thread")
         jobScheduler.mainLoop()
@@ -558,6 +558,7 @@ class JobScheduler @Inject()(val taskManager: TaskManager,
 
   def registerJobs(jobs: List[BaseJob]): List[ScheduleBasedJob] = {
     var scheduledJobList = List[ScheduleBasedJob]()
+
     lock.synchronized {
       require(isLeader,
               "Cannot register a job with this scheduler, not the leader!")

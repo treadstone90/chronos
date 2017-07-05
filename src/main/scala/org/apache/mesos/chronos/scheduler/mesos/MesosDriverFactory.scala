@@ -22,7 +22,7 @@ class MesosDriverFactory(
 
   private[this] val log = Logger.getLogger(getClass.getName)
 
-  var mesosDriver: Option[SchedulerDriver] = None
+  private var mesosDriver: Option[SchedulerDriver] = None
 
   def start(): Unit = {
     val status = get.start()

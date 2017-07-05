@@ -61,19 +61,13 @@ object JobUtils {
     baseJob.uris.isEmpty || baseJob.fetch.isEmpty // when you leave the deprecated one, then it should be empty
 
   def loadJobs(store: PersistenceStore): List[BaseJob] = {
-    val validatedJobs = new ListBuffer[BaseJob]
+    val (matching, notMatching) = store.getJobs.partition(j => j.isInstanceOf[DependencyBasedJob] || j.isInstanceOf[ScheduleBasedJob])
 
-    val jobs = store.getJobs
-
-    jobs.foreach {
-      case d: DependencyBasedJob => validatedJobs += d
-      case s: ScheduleBasedJob => validatedJobs += s
-      case x: Any =>
-        throw new IllegalStateException(
-          "Error, job is neither ScheduleBased nor DependencyBased:" + x.toString)
+    if(notMatching.nonEmpty) {
+      throw new IllegalStateException(s"Error, ${notMatching.size} jobs are neither ScheduleBased nor DependencyBased")
+    } else {
+      matching.toList
     }
-
-    validatedJobs.toList
   }
 
   def getScheduledTime(job: ScheduleBasedJob): DateTime = {

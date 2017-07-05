@@ -37,29 +37,29 @@ class TaskManager @Inject()(
   val log = Logger.getLogger(getClass.getName)
 
   /* index values into queues */
-  val HIGH_PRIORITY = 0
-  val NORMAL_PRIORITY = 1
+  private val HIGH_PRIORITY = 0
+  private val NORMAL_PRIORITY = 1
 
   /* Maintain a queue for high priority and normal priority jobs. (Just like boarding for airlines...
    * we have no guarantees of forward progress. But jobs in the high priority line always go first.) */
-  val queues = Array[java.util.concurrent.LinkedBlockingQueue[String]](
+  private val queues = Array[java.util.concurrent.LinkedBlockingQueue[String]](
     new java.util.concurrent.LinkedBlockingQueue[String], // high priority
     new java.util.concurrent.LinkedBlockingQueue[String])
-  val queuedJobs =
+  private val queuedJobs =
     Collections
       .newSetFromMap(new ConcurrentHashMap[String, java.lang.Boolean]())
       .asScala
   // normal
-  val names = Array[String]("High priority", "Normal priority")
-  val taskMapping: concurrent.Map[String,
+  private val names = Array[String]("High priority", "Normal priority")
+  private val taskMapping: concurrent.Map[String,
                                   mutable.ListBuffer[(String, Future[_])]] =
     new ConcurrentHashMap[String, mutable.ListBuffer[(String, Future[_])]]().asScala
-  val queueGauge = registry.register(
+  private val queueGauge = registry.register(
     MetricRegistry.name(classOf[TaskManager], "queueSize"),
     new Gauge[Long] {
       def getValue = queues(NORMAL_PRIORITY).size
     })
-  val highQueueGauge = registry.register(
+  private val highQueueGauge = registry.register(
     MetricRegistry.name(classOf[TaskManager], "highQueueSize"),
     new Gauge[Long] {
       def getValue = queues(HIGH_PRIORITY).size
@@ -249,7 +249,7 @@ class TaskManager @Inject()(
     } else {
       val (_, _, attempt, _) = TaskUtils.parseTaskId(taskId)
       val job = jobOption.get
-      jobsObserver.apply(JobQueued(job, taskId, attempt))
+      jobsObserver(JobQueued(job, taskId, attempt))
     }
 
     if (config.reviveOffersForNewJobs()) {

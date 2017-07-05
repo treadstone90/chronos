@@ -38,12 +38,12 @@ docker run -e http_proxy=$http_proxy -v `pwd`:/mnt/build --entrypoint=/bin/sh ma
   "
 
 # build image
-docker build --build-arg http_proxy=$http_proxy -t mesosphere/chronos:$image_tag .
+docker build --build-arg http_proxy=$http_proxy -t treadstone90/chronos:$image_tag .
 
 if [ ! -z ${DOCKER_HUB_USERNAME+x} ] && [ ! -z ${DOCKER_HUB_PASSWORD+x} ]; then
   # login to dockerhub
   docker login -u "${DOCKER_HUB_USERNAME}" -p "${DOCKER_HUB_PASSWORD}"
 
   # push image
-  docker push mesosphere/chronos:$image_tag
+  docker push treadstone90/chronos:$image_tag
 fi
