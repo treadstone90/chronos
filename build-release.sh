@@ -45,5 +45,5 @@ if [ ! -z ${DOCKER_HUB_USERNAME+x} -a ! -z ${DOCKER_HUB_PASSWORD+x} ]; then
   docker login -u "${DOCKER_HUB_USERNAME}" -p "${DOCKER_HUB_PASSWORD}"
 
   # push image
-  docker push mesosphere/chronos:$image_tag
+  docker push treadstone90/chronos:$image_tag
 fi
