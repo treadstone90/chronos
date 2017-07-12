@@ -20,7 +20,7 @@ class MesosJobFrameworkSpec extends SpecificationWithJUnit with Mockito {
       val mesosJobFramework = new MesosJobFramework(
         MockJobUtils.mockDriverFactory,
         mock[JobScheduler],
-        mock[TaskManager], mock[MetricRegistry],
+        mock[TaskManager], new MetricRegistry,
         makeConfig(),
         mock[FrameworkIdUtil],
         mock[MesosTaskBuilder],
@@ -38,7 +38,7 @@ class MesosJobFrameworkSpec extends SpecificationWithJUnit with Mockito {
       val mesosJobFramework = new MesosJobFramework(
         mock[MesosDriverFactory],
         mock[JobScheduler],
-        mock[TaskManager], mock[MetricRegistry],
+        mock[TaskManager], new MetricRegistry,
         makeConfig(),
         mock[FrameworkIdUtil],
         mock[MesosTaskBuilder],
@@ -115,7 +115,7 @@ class MesosJobFrameworkSpec extends SpecificationWithJUnit with Mockito {
       val mesosJobFramework = new MesosJobFramework(
         mockDriverFactory,
         jobScheduler,
-        MockJobUtils.mockTaskManager, mock[MetricRegistry],
+        MockJobUtils.mockTaskManager, new MetricRegistry,
         makeConfig(),
         mock[FrameworkIdUtil],
         mock[MesosTaskBuilder],
